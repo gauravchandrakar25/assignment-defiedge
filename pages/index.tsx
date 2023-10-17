@@ -9,40 +9,61 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import contractABI from "../abis/MarketSentiment.json";
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 
 const Home: NextPage = () => {
   const account = useAccount();
-  const ipfsGateway = process.env.NEXT_PUBLIC_IPFS_GATEWAY;
+  const [arrayInput, setInput] = useState("");
 
-  const contractRead = useContractRead({
+  const contractRead = useContractRead<any,any,any>({
     address: "0x3406965957385F420D37ef7b86b2001c30e7F375",
     abi: [
       {
-        inputs: [],
-        name: "owner",
-        outputs: [{ internalType: "address", name: "", type: "address" }],
+        inputs: [{ internalType: "string", name: "_ticker", type: "string" }],
+        name: "getVotes",
+        outputs: [
+          { internalType: "uint256", name: "up", type: "uint256" },
+          { internalType: "uint256", name: "down", type: "uint256" },
+        ],
         stateMutability: "view",
         type: "function",
       },
     ],
-    functionName: "owner",
+    functionName: "getVotes",
+    args: [arrayInput],
   });
+
+  const upVote = contractRead?.data[1]
+  const downVote = contractRead?.data[0]
+
+  console.log(contractRead)
+  console.log(upVote);
 
   const { config } = usePrepareContractWrite({
     address: "0x3406965957385F420D37ef7b86b2001c30e7F375",
     abi: [
       {
-        inputs: [],
-        name: "owner",
-        outputs: [{ internalType: "address", name: "", type: "address" }],
-        stateMutability: "view",
+        inputs: [
+          { internalType: "string", name: "_ticker", type: "string" },
+          { internalType: "bool", name: "_vote", type: "bool" },
+        ],
+        name: "vote",
+        outputs: [],
+        stateMutability: "nonpayable",
         type: "function",
       },
     ],
   });
 
-  const { write: vote, isSuccess } = useContractWrite(config);
+  const handleChange = (event: any) => {
+    setInput(event.target.value);
+  };
+
+  const handleSetEvent = (event: any) => {
+    setInput(event.target.value);
+  };
+  const { write } = useContractWrite(config);
 
   return (
     <div className={styles.container}>
@@ -61,13 +82,31 @@ const Home: NextPage = () => {
             Get started by connecting your wallet
           </p>
         )}
-
-        <div>
-          {/* <button onClick={contractRead}>Vote for</button> */}
-        </div>
-        <div>
-        <p className={styles.description}>Smart contract owner's address : {contractRead.data}</p>
-        </div>
+        <p className={styles.description}>
+          Enter any ticker from (ETH, BTC, LINK)
+        </p>
+        {contractRead?.data !== undefined && (
+          <>
+            <p className={styles.description}>
+              Up Votes are `${upVote}`
+            </p>
+            <p className={styles.description}>
+              Down Votes are `{contractRead?.data[0]}`
+            </p>
+          </>
+        )}
+        <button onClick={(event) => handleSetEvent(event)} value="ETH">
+          {" "}
+          Get Votes for ETH
+        </button>
+        <button onClick={(event) => handleSetEvent(event)} value="BTC">
+          {" "}
+          Get Votes for BTC
+        </button>
+        <button onClick={(event) => handleSetEvent(event)} value="LINK">
+          {" "}
+          Get Votes for LINK
+        </button>
       </main>
     </div>
   );

@@ -13,7 +13,7 @@ import {
   zora,
   polygonMumbai,
 } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
+import { infuraProvider } from 'wagmi/providers/infura'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
@@ -22,18 +22,17 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     optimism,
     arbitrum,
     base,
-    zora,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [goerli] : []),
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
       ? [polygonMumbai]
       : []),
   ],
-  [publicProvider()]
+  [infuraProvider({ apiKey: '49da1f1e1162470eac362186f2ddf558' })],
 );
 
 const { connectors } = getDefaultWallets({
   appName: "Assignment-DefiEdge",
-  projectId: "YOUR_PROJECT_ID",
+  projectId: "49da1f1e1162470eac362186f2ddf558",
   chains,
 });
 
