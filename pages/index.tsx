@@ -15,8 +15,9 @@ import { ethers } from "ethers";
 const Home: NextPage = () => {
   const account = useAccount();
   const [arrayInput, setInput] = useState("");
+  const [responseData, setResponseData] = useState([]);
 
-  const contractRead = useContractRead<any,any,any>({
+  const contractRead = useContractRead<any, any, any>({
     address: "0x3406965957385F420D37ef7b86b2001c30e7F375",
     abi: [
       {
@@ -34,11 +35,11 @@ const Home: NextPage = () => {
     args: [arrayInput],
   });
 
-  const upVote = contractRead?.data[1]
-  const downVote = contractRead?.data[0]
+  // const upVote = contractRead?.data[1]
+  // const downVote = contractRead?.data[0]
 
-  console.log(contractRead)
-  console.log(upVote);
+  console.log(contractRead);
+  // console.log(upVote);
 
   const { config } = usePrepareContractWrite({
     address: "0x3406965957385F420D37ef7b86b2001c30e7F375",
@@ -56,13 +57,11 @@ const Home: NextPage = () => {
     ],
   });
 
-  const handleChange = (event: any) => {
-    setInput(event.target.value);
-  };
-
   const handleSetEvent = (event: any) => {
     setInput(event.target.value);
+    setResponseData(contractRead.data);
   };
+
   const { write } = useContractWrite(config);
 
   return (
@@ -75,38 +74,56 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         <ConnectButton />
         <h1 className={styles.title}>Welcome to DefiEdge</h1>
-        {account.isConnected ? (
-          <p className={styles.description}>Hello {account.address}</p>
-        ) : (
+        {!account.isConnected && (
           <p className={styles.description}>
             Get started by connecting your wallet
           </p>
         )}
-        <p className={styles.description}>
-          Enter any ticker from (ETH, BTC, LINK)
-        </p>
-        {contractRead?.data !== undefined && (
+        {account.isConnected && (
           <>
-            <p className={styles.description}>
-              Up Votes are `${upVote}`
-            </p>
-            <p className={styles.description}>
-              Down Votes are `{contractRead?.data[0]}`
-            </p>
+            <p className={styles.description}>Get vote count of any ticker</p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={(event) => handleSetEvent(event)}
+                value="ETH"
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+              >
+                {" "}
+                Get Votes for ETH
+              </button>
+              <button
+                onClick={(event) => handleSetEvent(event)}
+                value="BTC"
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+              >
+                {" "}
+                Get Votes for BTC
+              </button>
+              <button
+                onClick={(event) => handleSetEvent(event)}
+                value="LINK"
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+              >
+                {" "}
+                Get Votes for LINK
+              </button>
+            </div>
+            {responseData.length > 0 && (
+              <>
+                <div className="flex gap-4 mt-3">
+                  <p className={styles.description}>
+                    Up votes : {String(responseData[1])}
+                    {/* Up Votes are `${upVote}` */}
+                  </p>
+                  <p className={styles.description}>
+                    Down Votes : {String(responseData[0])}
+                  </p>
+                </div>
+              </>
+            )}
           </>
         )}
-        <button onClick={(event) => handleSetEvent(event)} value="ETH">
-          {" "}
-          Get Votes for ETH
-        </button>
-        <button onClick={(event) => handleSetEvent(event)} value="BTC">
-          {" "}
-          Get Votes for BTC
-        </button>
-        <button onClick={(event) => handleSetEvent(event)} value="LINK">
-          {" "}
-          Get Votes for LINK
-        </button>
       </main>
     </div>
   );
