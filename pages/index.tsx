@@ -20,30 +20,33 @@ const Home: NextPage = () => {
   const contractAddress = "0x3406965957385F420D37ef7b86b2001c30e7F375";
   const [tokenName, setTokenname] = useState("");
   const [vote, setVote] = useState(null);
+  let contractRead: any;
 
-  const contractRead = useContractRead<any, any, any>({
-    address: contractAddress,
-    abi: [
-      {
-        inputs: [{ internalType: "string", name: "_ticker", type: "string" }],
-        name: "getVotes",
-        outputs: [
-          { internalType: "uint256", name: "up", type: "uint256" },
-          { internalType: "uint256", name: "down", type: "uint256" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ],
-    functionName: "getVotes",
-    args: [arrayInput],
-  });
+  if (!tokenName && vote != null) {
+    contractRead = useContractRead<any, any, any>({
+      address: contractAddress,
+      abi: [
+        {
+          inputs: [{ internalType: "string", name: "_ticker", type: "string" }],
+          name: "getVotes",
+          outputs: [
+            { internalType: "uint256", name: "up", type: "uint256" },
+            { internalType: "uint256", name: "down", type: "uint256" },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ],
+      functionName: "getVotes",
+      args: [arrayInput],
+    });
+  }
 
   const {
     config,
     isLoading,
-    isError,
-    error,
+    isError: fromVote,
+    error: voteError,
     data: writeData,
   } = usePrepareContractWrite({
     address: contractAddress,
@@ -63,13 +66,13 @@ const Home: NextPage = () => {
     args: [tokenName, Boolean(vote)],
   });
 
-  if (isError) {
-    alert(error?.message)
+  if (fromVote) {
+    alert(voteError?.message);
   }
 
   const handleSetEvent = (event: any) => {
     setInput(event.target.value);
-    setResponseData(contractRead.data);
+    setResponseData(contractRead?.data);
   };
 
   const handleFlag = () => {
@@ -87,18 +90,18 @@ const Home: NextPage = () => {
   const voteETH = (e: any) => {
     setTokenname("ETH");
     setVote(e.target.value);
-    write?.();
+    !isLoading && write?.();
   };
 
   const voteBTC = (e: any) => {
     setTokenname("BTC");
     setVote(e.target.value);
-    write?.();
+    !isLoading && write?.();
   };
   const voteLINK = (e: any) => {
     setTokenname("LINK");
     setVote(e.target.value);
-    write?.();
+    !isLoading &&  write?.();
   };
 
   return (
