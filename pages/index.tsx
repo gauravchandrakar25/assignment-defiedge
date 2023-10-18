@@ -20,27 +20,6 @@ const Home: NextPage = () => {
   const contractAddress = "0x3406965957385F420D37ef7b86b2001c30e7F375";
   const [tokenName, setTokenname] = useState("");
   const [vote, setVote] = useState(null);
-  let contractRead: any;
-
-  if (!tokenName && vote != null) {
-    contractRead = useContractRead<any, any, any>({
-      address: contractAddress,
-      abi: [
-        {
-          inputs: [{ internalType: "string", name: "_ticker", type: "string" }],
-          name: "getVotes",
-          outputs: [
-            { internalType: "uint256", name: "up", type: "uint256" },
-            { internalType: "uint256", name: "down", type: "uint256" },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-      ],
-      functionName: "getVotes",
-      args: [arrayInput],
-    });
-  }
 
   const {
     config,
@@ -64,11 +43,29 @@ const Home: NextPage = () => {
     ],
     functionName: "vote",
     args: [tokenName, Boolean(vote)],
+    onError(error) {
+      alert(error.message)
+    }
   });
 
-  if (fromVote) {
-    alert(voteError?.message);
-  }
+  const contractRead = useContractRead<any, any, any>({
+    address: contractAddress,
+    abi: [
+      {
+        inputs: [{ internalType: "string", name: "_ticker", type: "string" }],
+        name: "getVotes",
+        outputs: [
+          { internalType: "uint256", name: "up", type: "uint256" },
+          { internalType: "uint256", name: "down", type: "uint256" },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+    ],
+    functionName: "getVotes",
+    args: [arrayInput],
+  });
+
 
   const handleSetEvent = (event: any) => {
     setInput(event.target.value);
@@ -101,7 +98,7 @@ const Home: NextPage = () => {
   const voteLINK = (e: any) => {
     setTokenname("LINK");
     setVote(e.target.value);
-    !isLoading &&  write?.();
+    !isLoading && write?.();
   };
 
   return (
