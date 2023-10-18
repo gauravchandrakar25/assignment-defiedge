@@ -10,12 +10,14 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { ethers } from "ethers";
 
 const Home: NextPage = () => {
   const account = useAccount();
   const [arrayInput, setInput] = useState("");
   const [responseData, setResponseData] = useState([]);
+  const [voteFlag, setVoteFlag] = useState(false);
 
   const contractRead = useContractRead<any, any, any>({
     address: "0x3406965957385F420D37ef7b86b2001c30e7F375",
@@ -34,12 +36,6 @@ const Home: NextPage = () => {
     functionName: "getVotes",
     args: [arrayInput],
   });
-
-  // const upVote = contractRead?.data[1]
-  // const downVote = contractRead?.data[0]
-
-  console.log(contractRead);
-  // console.log(upVote);
 
   const { config } = usePrepareContractWrite({
     address: "0x3406965957385F420D37ef7b86b2001c30e7F375",
@@ -62,6 +58,10 @@ const Home: NextPage = () => {
     setResponseData(contractRead.data);
   };
 
+  const handleFlag = () => {
+    setVoteFlag((current) => !current);
+  };
+
   const { write } = useContractWrite(config);
 
   return (
@@ -79,11 +79,26 @@ const Home: NextPage = () => {
             Get started by connecting your wallet
           </p>
         )}
-        {account.isConnected && (
-          <>
-            <p className={styles.description}>Get vote count of any ticker</p>
+        <div className="flex gap-4">
+          <button
+            onClick={handleFlag}
+            className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+          >
+            {" "}
+            Get vote count
+          </button>
+          <button
+            onClick={handleFlag}
+            className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+          >
+            {" "}
+            Vote
+          </button>
+        </div>
 
-            <div className="flex gap-4">
+        {account.isConnected && voteFlag && (
+          <>
+            <div className="flex gap-4 mt-3">
               <button
                 onClick={(event) => handleSetEvent(event)}
                 value="ETH"
@@ -109,7 +124,7 @@ const Home: NextPage = () => {
                 Get Votes for LINK
               </button>
             </div>
-            {responseData.length > 0 && (
+            {responseData?.length > 0 && (
               <>
                 <div className="flex gap-4 mt-3">
                   <p className={styles.description}>
@@ -124,6 +139,70 @@ const Home: NextPage = () => {
             )}
           </>
         )}
+
+        {/* Vote Functionality */}
+        <div className="flex gap-40">
+
+          <div className="text-center mt-5">
+            <h4 className="text-2xl">ETH</h4>
+            <div className="flex gap-8 mt-3">
+              <button
+                onClick={handleFlag}
+                className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+              >
+                {" "}
+                Up
+              </button>
+              <button
+                onClick={handleFlag}
+                className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded"
+              >
+                {" "}
+                Down
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center mt-5">
+            <h4 className="text-2xl">BTC</h4>
+            <div className="flex gap-8 mt-3">
+              <button
+                onClick={handleFlag}
+                className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+              >
+                {" "}
+                Up
+              </button>
+              <button
+                onClick={handleFlag}
+                className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded"
+              >
+                {" "}
+                Down
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center mt-5">
+            <h4 className="text-2xl">LINK</h4>
+            <div className="flex gap-8 mt-3">
+              <button
+                onClick={handleFlag}
+                className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+              >
+                {" "}
+                Up
+              </button>
+              <button
+                onClick={handleFlag}
+                className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded"
+              >
+                {" "}
+                Down
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
