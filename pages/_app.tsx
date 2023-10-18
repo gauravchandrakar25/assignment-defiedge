@@ -10,7 +10,6 @@ import {
   optimism,
   polygon,
   base,
-  zora,
   polygonMumbai,
 } from "wagmi/chains";
 import { infuraProvider } from 'wagmi/providers/infura'
@@ -32,9 +31,9 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "Assignment-DefiEdge",
-  projectId: "49da1f1e1162470eac362186f2ddf558",
+  projectId: "0e9b4f6203d9324f5a1700c21d3da97b",
   chains,
-});
+},);
 
 const wagmiConfig = createConfig({
   autoConnect: true,
